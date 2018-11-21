@@ -5,6 +5,7 @@ const passport=require("passport");
 const cookieParser=require("cookie-parser");
 const session=require("express-session");
 const exphbs=require("express-handlebars");
+const path=require("path");
 
 //Load keys
 const keys=require("./config/keys");
@@ -29,6 +30,7 @@ mongoose.connect(keys.mongoURI,{
 //Load routes
 const auth=require("./routes/auth");
 const index=require("./routes/index");
+const stories=require("./routes/stories");
 
 const app=express();
 
@@ -62,6 +64,10 @@ app.use((req,res,next) => {
 //Use routes
 app.use("/auth",auth);
 app.use("/",index);
+app.use("/stories",stories);
+
+//Set static folder
+app.use(express.static(path.join(__dirname,"public")));
 
 const port=process.env.PORT || 5000;
 
