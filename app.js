@@ -6,12 +6,26 @@ const cookieParser=require("cookie-parser");
 const session=require("express-session");
 const exphbs=require("express-handlebars");
 const path=require("path");
+const bodyParser=require("body-parser");
+const methodOverride=require("method-override");
 
 //Load keys
 const keys=require("./config/keys");
 
+//Handlebars helpers
+const {
+    truncate,
+    stripTags,
+    formatDate,
+    select,
+    editIcon
+}=require("./helpers/hbs");
+
 //Load user model
 require("./models/User");
+
+//Load stories model
+require("./models/Story");
 
 //Passport config
 require("./config/passport")(passport);
@@ -35,8 +49,19 @@ const stories=require("./routes/stories");
 const app=express();
 
 //Handlebars middleware
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.engine('handlebars', exphbs({
+    helpers:{
+        truncate:truncate,
+        stripTags:stripTags,
+        formatDate:formatDate,
+        select:select,
+        editIcon:editIcon
+    },
+    defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+
+//Mthod-override middleware
+app.use(methodOverride("_method"));
 
 //Cookie-parser middleware
 app.use(cookieParser());
@@ -47,6 +72,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+//Body-parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 //Passport middleware
 app.use(passport.initialize());
